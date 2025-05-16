@@ -1,21 +1,24 @@
+require('dotenv').config();
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const request = require("request");
 const https = require("https");
 const { url } = require("inspector");
 const { options } = require("request");
+const axios = require("axios");
 
 
 const app = express();
 
 app.use(express.static("public"));
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/", function(req, res){
+app.get("/", function (req, res) {
     res.sendFile(__dirname + "/sign-up.html")
 });
 
-app.post("/", function(req, res){
+app.post("/", function (req, res) {
     const firstName = req.body.fName;
     const lastName = req.body.lName;
     const email = req.body.email;
@@ -35,22 +38,22 @@ app.post("/", function(req, res){
 
     const jsonData = JSON.stringify(data);
 
-    const url = "https://us13.api.mailchimp.com/3.0/lists/415713c873";
+    const url2 = `https://${process.env.MAILCHIMP_DC}.api.mailchimp.com/3.0/lists/${process.env.MAILCHIMP_LIST_ID}`
 
     const options = {
         method: "POST",
-        auth: "kenny1:f365fe633759e633887a21f987954bd5-us13"
+        auth: `kenny1:${process.env.MAILCHIMP_API_KEY0}`
     }
 
-    const request = https.request(url, options, function(response){
+    const request = https.request(url, options, function (response) {
 
-        if(response.statusCode === 200){
+        if (response.statusCode === 200) {
             res.sendFile(__dirname + "/success.html")
         } else {
             res.sendFile(__dirname + "/failure.html")
         }
 
-        response.on("data", function(data){
+        response.on("data", function (data) {
             console.log(JSON.parse(data));
         })
     });
@@ -58,19 +61,13 @@ app.post("/", function(req, res){
 
     request.write(jsonData);
     request.end();
-    
+
 });
 
-app.post("/failure.html", function(req, res){
+app.post("/failure.html", function (req, res) {
     res.redirect("/");
 });
 
-app.listen(3000, function() {
+app.listen(3000, function () {
     console.log("Server is running on port 3000.")
 });
-
-// API Key
-// f365fe633759e633887a21f987954bd5-us13
-
-// Audience ID
-// 415713c873
