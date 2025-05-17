@@ -38,11 +38,11 @@ app.post("/", function (req, res) {
 
     const jsonData = JSON.stringify(data);
 
-    const url2 = `https://${process.env.MAILCHIMP_DC}.api.mailchimp.com/3.0/lists/${process.env.MAILCHIMP_LIST_ID}`
+    const url = `https://${process.env.MAILCHIMP_DC}.api.mailchimp.com/3.0/lists/${process.env.MAILCHIMP_LIST_ID}`
 
     const options = {
         method: "POST",
-        auth: `kenny1:${process.env.MAILCHIMP_API_KEY0}`
+        auth: `kenny1:${process.env.MAILCHIMP_API_KEY}`
     }
 
     const request = https.request(url, options, function (response) {
