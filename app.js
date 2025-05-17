@@ -2,10 +2,6 @@ require('dotenv').config();
 
 const express = require("express");
 const bodyParser = require("body-parser");
-const request = require("request");
-const https = require("https");
-const { url } = require("inspector");
-const { options } = require("request");
 const axios = require("axios");
 
 
@@ -18,7 +14,7 @@ app.get("/", function (req, res) {
     res.sendFile(__dirname + "/sign-up.html")
 });
 
-app.post("/", function (req, res) {
+app.post("/", async function (req, res) {
     const firstName = req.body.fName;
     const lastName = req.body.lName;
     const email = req.body.email;
@@ -34,35 +30,29 @@ app.post("/", function (req, res) {
                 }
             }
         ]
-    }
+    };
 
-    const jsonData = JSON.stringify(data);
+    const url = `https://${process.env.MAILCHIMP_DC}.api.mailchimp.com/3.0/lists/${process.env.MAILCHIMP_LIST_ID}`;
 
-    const url = `https://${process.env.MAILCHIMP_DC}.api.mailchimp.com/3.0/lists/${process.env.MAILCHIMP_LIST_ID}`
+    try {
+        const response = await axios.post(url, data, {
+            auth: {
+                username: "kenny1",
+                password: process.env.MAILCHIMP_API_KEY
+            }
+        });
 
-    const options = {
-        method: "POST",
-        auth: `kenny1:${process.env.MAILCHIMP_API_KEY}`
-    }
-
-    const request = https.request(url, options, function (response) {
-
-        if (response.statusCode === 200) {
-            res.sendFile(__dirname + "/success.html")
+        if (response.status === 200) {
+            res.sendFile(__dirname + "/success.html");
         } else {
-            res.sendFile(__dirname + "/failure.html")
+            res.sendFile(__dirname + "/failure.html");
         }
-
-        response.on("data", function (data) {
-            console.log(JSON.parse(data));
-        })
-    });
-
-
-    request.write(jsonData);
-    request.end();
-
+    } catch (error) {
+        console.error("Mailchimp API Error:", error.response?.data || error.message);
+        res.sendFile(__dirname + "/failure.html");
+    }
 });
+
 
 app.post("/failure.html", function (req, res) {
     res.redirect("/");
