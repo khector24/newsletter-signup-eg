@@ -1,11 +1,17 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+import express from 'express';
+import bodyParser from 'body-parser';
+import axios from 'axios';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const express = require("express");
-const bodyParser = require("body-parser");
-const axios = require("axios");
-
+dotenv.config();
 
 const app = express();
+
+// ES module replacements for __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -14,7 +20,7 @@ app.get("/", function (req, res) {
     res.sendFile(__dirname + "/sign-up.html")
 });
 
-app.post("/", async function (req, res) {
+app.post("/", async (req, res) => {
     const firstName = req.body.fName;
     const lastName = req.body.lName;
     const email = req.body.email;
@@ -43,13 +49,13 @@ app.post("/", async function (req, res) {
         });
 
         if (response.status === 200) {
-            res.sendFile(__dirname + "/success.html");
+            res.sendFile(path.join(__dirname + "/success.html"));
         } else {
-            res.sendFile(__dirname + "/failure.html");
+            res.sendFile(path.join(__dirname + "/failure.html"));
         }
     } catch (error) {
         console.error("Mailchimp API Error:", error.response?.data || error.message);
-        res.sendFile(__dirname + "/failure.html");
+        res.sendFile(path.join(__dirname + "/failure.html"));
     }
 });
 
