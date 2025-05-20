@@ -1,2 +1,2 @@
 # newsletter-signup-eg
-An example of how to do a newsletter sign-up using the Mailchimp API
+An example of creating a newsletter sign-up using the Mailchimp API and Bootstrap.
